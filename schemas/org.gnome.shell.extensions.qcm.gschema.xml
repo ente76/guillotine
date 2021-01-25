@@ -1,0 +1,12 @@
+<!-- Guillotine: a gnome extension designed for efficiently carrying out executions of commands from a customizable menu
+     Copyright (C) 2021 Christian Klaue (mail@ck76.de) -->
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/org/gnome/shell/extensions/guillotine/" id="org.gnome.shell.extensions.guillotine">
+    <key type="s" name="config">
+        <default>".config/guillotine.json"</default>
+    	  <summary>Config File Path</summary>
+        <description>Absolute path to your configuration file. Leave empty to use ~/.config/qcm.json.</description>
+    </key>
+  </schema>
+</schemalist>

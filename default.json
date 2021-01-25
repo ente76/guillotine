@@ -1,0 +1,25 @@
+{
+  "settings": {
+    "icon": "start-here",
+    "loglevel": "warning"
+  },
+  "menu": [
+    {
+      "type": "command",
+      "title": "Nautilus",
+      "command": "nautilus"
+    },
+    {
+      "type": "command",
+      "title": "Open Guillotine Configuration",
+      "command": "xdg-open .config/guillotine.json",
+      "icon": "preferences-other-symbolic"
+    },
+    {
+      "type": "command",
+      "title": "Open Guillotine Log",
+      "command": "gnome-terminal -e 'journalctl -f GNOME_SHELL_EXTENSION_UUID=guillotine@fopdoodle.net' ",
+      "icon": "emblem-documents-symbolic"
+    }
+  ]
+}
