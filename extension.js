@@ -228,11 +228,19 @@ class Switch {
 
 }
 
+const switchChecks = [{ name: "title", type: "string", default: "???" },
+{ name: "icon", type: "string" },
+{ name: "items", type: "object" }];
+
 class SubMenu {
     constructor(properties) {
-        this.title = properties.title || "";
-        this.icon = properties.icon || "";
-        this.items = parseMenu(this.items || "");
+        let self = {};
+        // sanity checks
+        parseProperties(properties, self, switchChecks);
+        Object.assign(this, self);
+
+        this.UI = new UI.PopupSubMenu();
+        
         debug("menu item '" + this.title + "' created");
     }
     cancel() {

@@ -2,7 +2,7 @@
 
 Guillotine is a gnome extension designed for efficiently carrying out executions of commands from a customizable menu.\nSimply speaking: it is a highly customizable menu that enables you to launch commands and toggle services.
 
-## Installation
+![](img/img1.png)
 
 ## Quick Start
 
@@ -57,20 +57,9 @@ With regards to command instancing: some UI applications are behaving weird with
 
 A switch is strictly running a single instance. You won't be able to access the menu item while the `start`, the `stop` or the `check` command are executed. To be more precise: a `start` and a `stop` command will disable the menu. The next `check` command may enable the menu on success.
 
-#### 3. submenu
+#### 3. separator
 
-| property           | description                                            |
-|--------------------|--------------------------------------------------------|
-| `type`             | `submenu`                                              |
-| `title` (string)   | title to show                                          |
-| `icon` (string)    | an icon to show                                        |
-| `items` ([])       | an array of any item                                   |
-
-#### 4. separator
-
-| property           | description                                            |
-|--------------------|--------------------------------------------------------|
-| `type`             | `separator`                                            |
+- `type`: `separator`
 
 ### Icons
 
