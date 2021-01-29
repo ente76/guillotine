@@ -15,7 +15,7 @@ const DEBUG = 0;
 const INFO = 1;
 const WARNING = 2;
 const ERROR = 3;
-var LogLevel = DEBUG;
+var LogLevel = WARNING;
 
 /******************************************************************************/
 /***** LOGGING                                                            *****/
@@ -228,7 +228,7 @@ class Switch {
 
 }
 
-const switchChecks = [{ name: "title", type: "string", default: "???" },
+const menuChecks = [{ name: "title", type: "string", default: "???" },
 { name: "icon", type: "string" },
 { name: "items", type: "object" }];
 
@@ -236,13 +236,21 @@ class SubMenu {
     constructor(properties) {
         let self = {};
         // sanity checks
-        parseProperties(properties, self, switchChecks);
+        parseProperties(properties, self, menuChecks);
         Object.assign(this, self);
+        debug(this.icon);
+        if ("icon" in this) {
+            this.UI = new UI.popupMenu.PopupSubMenuMenuItem(this.title, true);
+            this.UI.icon.icon_name = this.icon;
+        } else this.UI = new UI.popupMenu.PopupSubMenuMenuItem(this.title);
 
-        this.UI = new UI.PopupSubMenu();
-        
+        this.items = parseMenu(self.items);
+        for (const item in this.items) {
+            this.UI.menu.addMenuItem(this.items[item].UI);
+        }
         debug("menu item '" + this.title + "' created");
     }
+
     cancel() {
 
     }
@@ -415,6 +423,8 @@ function parseMenu(menu) {
     types["submenu"] = SubMenu;
     types["separator"] = Separator;
 
+    debug(typeof menu);
+    debug(Array.isArray(menu));
     if (typeof menu === "object" && Array.isArray(menu)) {
         for (const item in menu) {
             if (!("type" in menu[item])) throw new Error("Invalid menu item: missing 'type' property");

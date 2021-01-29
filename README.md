@@ -2,20 +2,91 @@
 
 Guillotine is a gnome extension designed for efficiently carrying out executions of commands from a customizable menu.\nSimply speaking: it is a highly customizable menu that enables you to launch commands and toggle services.
 
-![](img/img1.png)
-
-## Quick Start
-
-If no config is found, a default config is restored at `~/.config/guillotine.json`.
+![](example.png)
 
 ## Configuration
 
+If no configuration is found, a default config is restored at `~/.config/guillotine.json`. Whenever the configuration file changes, the extension reloads automatically.
+
 The configuration has two segments: `settings` and `menu`.
+
+### Example
+
+```
+{
+  "settings": {
+    "icon": "start-here-symbolic.symbolic",
+    "loglevel": "warning"
+  },
+  "menu": [
+    {
+      "type": "command",
+      "title": "teamspeak",
+      "command": "zsh -c 'pactl set-card-profile $(pactl list short | grep bluez_card | cut -f1) headset_head_unit;pactl set-default-sink $(pactl list short sinks | grep alsa_output | cut -f1);teamspeak3'",
+      "icon": "audio-headset-symbolic"
+    },
+    {
+      "type": "separator"
+    },
+    {
+      "type": "command",
+      "title": "code guillotine",
+      "command": "code Projects/guillotine",
+      "icon": "start-here-symbolic.symbolic",
+      "killOnDisable": false
+    },
+    {
+      "type": "command",
+      "title": "code systemd.rs",
+      "command": "code Projects/systemd.rs",
+      "icon": "computer-fail-symbolic.symbolic",
+      "killOnDisable": false
+    },
+    {
+      "type": "separator"
+    },
+    {
+      "type": "submenu",
+      "title": "Guillotine",
+      "icon": "start-here",
+      "items": [
+        {
+          "type": "command",
+          "title": "Configuration",
+          "command": "xdg-open .config/guillotine.json",
+          "instancing": "singleInstance",
+          "icon": "preferences-other-symbolic",
+          "killOnDisable": false
+        },
+        {
+          "type": "command",
+          "title": "Log",
+          "command": "gnome-terminal -e 'journalctl -f GNOME_SHELL_EXTENSION_UUID=guillotine@fopdoodle.net'",
+          "instancing": "singleInstance",
+          "icon": "emblem-documents-symbolic"
+        }
+      ]
+    },
+    {
+      "type": "separator"
+    },
+    {
+      "type": "switch",
+      "title": "syncthing",
+      "start": "systemctl --user --quiet start syncthing.service",
+      "stop": "systemctl --user --quiet stop syncthing.service",
+      "check": "systemctl --user --quiet is-active syncthing.service",
+      "icon": "emblem-synchronizing-symbolic",
+      "interval": 500
+    }
+  ]
+}
+```
 
 ### Settings
 
-- `icon`: (optional, string) the name of a system icon to show in the top bar.
-- `loglevel`: (optional, string) the log level of the extenions. any of the following values is valid:
+- `icon`: (string) the name of a system icon to show in the top bar.
+- `loglevel`: (string) the log level of the extenions. any of the following values is valid:
   - `debug`
   - `info`
   - `warning` (default)
@@ -23,7 +94,7 @@ The configuration has two segments: `settings` and `menu`.
 
 ### Menu
 
-The menu is an array of any of the following objects.
+The menu is an array of items, each being on of the following types.
 
 #### 1. command
 
@@ -35,18 +106,14 @@ The menu is an array of any of the following objects.
   - `singleInstance`: the menu item is disabled until the old process finished
   - `multipleInstances` (default): no restrictions; multiple instances may be executed in parallel
   - `killBeforeRestart`: the running process is killed forcefully when the menu is selected a second time
-- `killOnDisable` (boolean): shall a running process get killed when the extension gets disabled? Defaults to `true`.
+- `killOnDisable` (boolean): whether the process gets killed when the extension gets disabled, defaults to `true`
 
-With regards to command instancing: some UI applications are behaving weird with regards to process creation. There are two types of weird applications:
-
-- An app gets started but the startup process finishes almost instantly. For Guillotine this app is considered closed almost instantly. `code` is an example for such app. The options for `instancing` and `killOnDisable` have no effect on such app.
-- An app gets started. When the app is closed by the user, the process keeps running. Although the app is no longer visible, you won't be able to start it a second time if `instancing` is put to `singleInstance`.
+The options `singleInstance`, `killBeforeRestart` and `killOnDisable` have no impact on background processes, i.e., these options don't work on something like `sh -c 'long-running-command &'`. Some applications are implicitly behaving like this.
 
 #### 2. switch
 
 - `type`: `switch`
 - `title` (string): title to show
-- `icon` (string): name of a system icon to show
 - `start` (string): command to execute when switching from off to on
 - `stop` (string): command to execute when switching from on to off
 - `check` (string): command to run when checking the toggle state
@@ -55,9 +122,16 @@ With regards to command instancing: some UI applications are behaving weird with
   - depends on `checks`
   - the interval is the length of the pause between 2 checks, i.e. if the command assigned to `check` takes 200 ms to execute and `interval` is set to 500, the command is started every 700 ms.
 
-A switch is strictly running a single instance. You won't be able to access the menu item while the `start`, the `stop` or the `check` command are executed. To be more precise: a `start` and a `stop` command will disable the menu. The next `check` command may enable the menu on success.
+A switch is strictly running a single instance. You won't be able to access the menu item while the `start` or the `stop` command are executed. To be more precise: a `start` and a `stop` command will disable the menu. The next `check` command may enable the menu on success.
 
-#### 3. separator
+#### 3. submenu
+
+- `type`: `switch`
+- `title` (string): title to show
+- `icon` (string): name of a system icon to show
+- `items` ([]): an arry of items, see [menu](###menu)
+
+#### 4. separator
 
 - `type`: `separator`
 
@@ -68,7 +142,7 @@ Icons can be found by searching any subdirectory of the following directories:
 - ~/.local/share/icons
 - /usr/share/icons
 
-`gtk3-icon-browser` is an app that shows a selection of system icons.
+`gtk3-icon-browser` is an app that shows a selection of system icons. Personally I use glade to browse the local icons.
 
 ## License
 
