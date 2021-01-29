@@ -144,6 +144,18 @@ Icons can be found by searching any subdirectory of the following directories:
 
 `gtk3-icon-browser` is an app that shows a selection of system icons. Personally I use glade to browse the local icons.
 
+## ToDo
+
+Plans. For whenever I will get bored again.
+
+- [ ] notifications
+  - [ ] on extension error
+  - [ ] on command error
+  - [ ] on implicit switching
+- [ ] error handling
+  - [ ] notifications
+  - [ ] icon update
+
 ## License
 
 Guillotine: a gnome extension designed for efficiently carrying out executions of commands from a customizable menu
