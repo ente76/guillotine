@@ -1,6 +1,6 @@
-# Quick Custom Menu
+# Guillotine
 
-Guillotine is a gnome extension designed for efficiently carrying out executions of commands from a customizable menu.\nSimply speaking: it is a highly customizable menu that enables you to launch commands and toggle services.
+Guillotine is a gnome extension designed for efficiently carrying out executions of commands from a customizable menu. Simply speaking: it is a highly customizable menu that enables you to launch commands and toggle services.
 
 ![](example.png)
 
