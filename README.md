@@ -15,7 +15,6 @@ The configuration has two segments: `settings` and `menu`.
 ```
 {
   "settings": {
-    "icon": "start-here-symbolic.symbolic",
     "loglevel": "warning"
   },
   "menu": [
@@ -48,7 +47,7 @@ The configuration has two segments: `settings` and `menu`.
     {
       "type": "submenu",
       "title": "Guillotine",
-      "icon": "start-here",
+      "icon": "guillotine-symbolic",
       "items": [
         {
           "type": "command",
