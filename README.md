@@ -158,6 +158,9 @@ Icons can be found by searching any subdirectory of the following directories:
   - logging adjusted: 
     - switch-check adjusted to debug
     - log level logging fixed
+- v4: 01.02.2021
+  - metadata fixed / prepared for v4
+  - icon for extensions.gnome.org added
 
 ## ToDo
 
