@@ -76,8 +76,12 @@ class Command {
         parseProperties(properties, self, commandChecks);
         Object.assign(this, self);
         // setup UI
-        if ("icon" in this)
-            this.UI = new UI.popupMenu.PopupImageMenuItem(this.title, this.icon);
+
+        if ("icon" in this) {
+            if (this.icon.toLowerCase() === "guillotine-symbolic") this.UI = new UI.popupMenu.PopupImageMenuItem(this.title, Gio.icon_new_for_string(Me.path + "/guillotine-symbolic.svg"));
+            else this.UI = new UI.popupMenu.PopupImageMenuItem(this.title, this.icon);
+        }
+
         else
             this.UI = new UI.popupMenu.PopupMenuItem(this.title);
         if (!("command" in this))
@@ -149,6 +153,14 @@ class Switch {
         Object.assign(this, self);
 
         this.UI = new UI.popupMenu.PopupSwitchMenuItem(this.title, false);
+
+        if ("icon" in this) {
+            this.UI.icon = new St.Icon({ style_class: 'popup-menu-icon' });
+            if (this.icon.toLowerCase() === "guillotine-symbolic") this.UI.icon.gicon = Gio.icon_new_for_string(Me.path + "/guillotine-symbolic.svg");
+            else this.UI.icon.icon_name = this.icon;
+            this.UI.insert_child_at_index(this.UI.icon, 1);
+        }
+
         if (!("start" in this)) this.UI.setSensitive(false);
 
         // setup callbacks
@@ -199,7 +211,7 @@ class Switch {
         let pid = subprocess.get_identifier();
         subprocess.wait_check_async(null, this.tested.bind(this, pid, auto));
         this.processes[pid] = subprocess;
-        info("checking process for '" + this.title + "' [" + pid + "] started");
+        debug("checking process for '" + this.title + "' [" + pid + "] started");
     }
 
     tested(pid, auto) {
@@ -241,7 +253,8 @@ class SubMenu {
         debug(this.icon);
         if ("icon" in this) {
             this.UI = new UI.popupMenu.PopupSubMenuMenuItem(this.title, true);
-            this.UI.icon.icon_name = this.icon;
+            if (this.icon.toLowerCase() === "guillotine-symbolic") this.UI.icon.gicon = Gio.icon_new_for_string(Me.path + "/guillotine-symbolic.svg");
+            else this.UI.icon.icon_name = this.icon;
         } else this.UI = new UI.popupMenu.PopupSubMenuMenuItem(this.title);
 
         this.items = parseMenu(self.items);
@@ -313,12 +326,12 @@ class Guillotine {
         }
 
         LogLevel = ["debug", "info", "warning", "error"].indexOf(this.settings.loglevel.toLowerCase());
-        error("Log level at: " + LogLevel);
+        info("Log level at: " + this.settings.loglevel);
+
         // icon
-        this.icon = new St.Icon({
-            icon_name: this.settings.icon,
-            style_class: "system-status-icon"
-        });
+        let icon = Gio.icon_new_for_string(Me.path + "/guillotine-symbolic.svg");
+        this.icon = new St.Icon({ gicon: icon });
+        this.icon.style_class = "system-status-icon";
 
         // button
         this.button = new UI.panelMenu.Button(0.0, "guillotine", false);

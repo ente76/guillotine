@@ -1,0 +1,31 @@
+<svg width="1024" height="1024" version="1.1" viewBox="0 0 270.93 270.93" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+	<title>KPI</title>
+	<metadata>
+		<rdf:RDF>
+			<cc:Work rdf:about="">
+				<dc:format>image/svg+xml</dc:format>
+				<dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+				<dc:title>KPI</dc:title>
+				<cc:license rdf:resource="http://creativecommons.org/licenses/by-nc-nd/4.0/"/>
+				<dc:date>31.01.2021</dc:date>
+				<dc:creator>
+					<cc:Agent>
+						<dc:title>Christian Klaue &lt;mail@ck76.de&gt;</dc:title>
+					</cc:Agent>
+				</dc:creator>
+			</cc:Work>
+			<cc:License rdf:about="http://creativecommons.org/licenses/by-nc-nd/4.0/">
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
+				<cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
+				<cc:requires rdf:resource="http://creativecommons.org/ns#Notice"/>
+				<cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"/>
+				<cc:prohibits rdf:resource="http://creativecommons.org/ns#CommercialUse"/>
+			</cc:License>
+		</rdf:RDF>
+	</metadata>
+	<path d="m39.617 64.743 56.461 60.924-62.476 80.52h34.73l46.372-62.476 14.552 15.134v47.338h29.104v-50.442h36.282c25.999 0 42.686-18.432 42.686-47.148 0-28.328-16.104-43.85-45.596-43.85h-62.476v62.088l-55.297-62.088zm118.74 24.254h27.163c15.522 0 22.701 6.7907 22.701 21.149 0 14.552-7.1791 21.343-22.701 21.343l-27.163-.001z" style="fill:#eeeeee"/>
+	<g style="stroke-linecap:round;stroke-width:16.933;stroke:#00b8e6">
+		<path d="m25.4 25.4h220.13"/>
+		<path d="m25.4 245.53h220.13"/>
+	</g>
+</svg>

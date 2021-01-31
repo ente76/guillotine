@@ -114,6 +114,7 @@ The options `singleInstance`, `killBeforeRestart` and `killOnDisable` have no im
 
 - `type`: `switch`
 - `title` (string): title to show
+- `icon` (string): name of a system icon to show
 - `start` (string): command to execute when switching from off to on
 - `stop` (string): command to execute when switching from on to off
 - `check` (string): command to run when checking the toggle state
@@ -143,6 +144,15 @@ Icons can be found by searching any subdirectory of the following directories:
 - /usr/share/icons
 
 `gtk3-icon-browser` is an app that shows a selection of system icons. Personally I use glade to browse the local icons.
+
+## Change History
+
+- v3: 31.01.2021
+  - extension icon
+  - icons for switches
+  - logging adjusted: 
+    - switch-check adjusted to debug
+    - log level logging fixed
 
 ## ToDo
 
