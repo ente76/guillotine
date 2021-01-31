@@ -85,7 +85,6 @@ The configuration has two segments: `settings` and `menu`.
 
 ### Settings
 
-- `icon`: (string) the name of a system icon to show in the top bar.
 - `loglevel`: (string) the log level of the extenions. any of the following values is valid:
   - `debug`
   - `info`
