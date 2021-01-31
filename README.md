@@ -147,6 +147,12 @@ Icons can be found by searching any subdirectory of the following directories:
 
 ## Change History
 
+- v1: 26.01.2026
+  - initiale version
+- v2: 29.01.2021
+  - fixed a bug which prevented startup
+  - implemented "submenu"
+  - improved documentation
 - v3: 31.01.2021
   - extension icon
   - icons for switches
