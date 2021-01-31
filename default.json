@@ -1,13 +1,12 @@
 {
   "settings": {
-    "icon": "guillotine-icon",
     "loglevel": "warning"
   },
   "menu": [
     {
       "type": "submenu",
       "title": "Guillotine",
-      "icon": "guillotine-icon",
+      "icon": "guillotine-symbolic",
       "items": [
         {
           "type": "command",
