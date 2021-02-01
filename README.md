@@ -1,3 +1,5 @@
+[![](https://img.shields.io/badge/buy%20me%20a%20coffee-or%20else%20I%20sing-53a0d0?style=flat&logo=Buy-Me-A-Coffee)](https://www.buymeacoffee.com/ente)
+
 # Guillotine
 
 Guillotine is a gnome extension designed for efficiently carrying out executions of commands from a customizable menu. Simply speaking: it is a highly customizable menu that enables you to launch commands and toggle services.
