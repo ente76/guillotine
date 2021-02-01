@@ -162,6 +162,7 @@ Icons can be found by searching any subdirectory of the following directories:
 - v4: 01.02.2021
   - metadata fixed / prepared for v4
   - icon for extensions.gnome.org added
+  - button for buy-me-a-coffee added
 
 ## ToDo
 
