@@ -283,9 +283,8 @@ class Separator {
 /******************************************************************************/
 /***** Guillotine                                                         *****/
 /******************************************************************************/
-const settingsChecks = [{ name: "icon", type: "string", default: "start-here" },
-{ name: "interval", type: "number", default: 500 },
-{ name: "loglevel", type: "string", default: "warning", values: ["debug", "info", "warning", "error"] }];
+
+const settingsChecks = [{ name: "loglevel", type: "string", default: "warning", values: ["debug", "info", "warning", "error"] }];
 
 class Guillotine {
     constructor(meta) {
