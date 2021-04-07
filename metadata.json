@@ -6,7 +6,6 @@
     "url": "https://github.com/ente76/guillotine/",
     "settings-schema": "org.gnome.shell.extensions.guillotine",
     "shell-version": [
-        "3.38",
         "40.0"
     ]
 }
