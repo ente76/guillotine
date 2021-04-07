@@ -1,10 +1,10 @@
-[![](https://img.shields.io/badge/buy%20me%20a%20coffee-or%20I%20sing-53a0d0?style=flat&logo=Buy-Me-A-Coffee)](https://www.buymeacoffee.com/ente)  [![](https://img.shields.io/badge/paypal-donation-53a0d0?style=flat&logo=paypal)](https://www.paypal.com/donate?hosted_button_id=CRGNTJBS4AD4G)
+[![buy me a coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-or%20I%20sing-53a0d0?style=flat&logo=Buy-Me-A-Coffee)](https://www.buymeacoffee.com/ente)  [![donate@paypal](https://img.shields.io/badge/paypal-donation-53a0d0?style=flat&logo=paypal)](https://www.paypal.com/donate?hosted_button_id=CRGNTJBS4AD4G)
 
 # Guillotine
 
 Guillotine is a gnome extension designed for efficiently carrying out executions of commands from a customizable menu. Simply speaking: it is a highly customizable menu that enables you to launch commands and toggle services.
 
-![](example.png)
+![example.png](example.png)
 
 ## Configuration
 
@@ -14,7 +14,7 @@ The configuration has two segments: `settings` and `menu`.
 
 ### Example
 
-```
+```JSON
 {
   "settings": {
     "loglevel": "warning"
@@ -84,7 +84,7 @@ The configuration has two segments: `settings` and `menu`.
 }
 ```
 
-### Settings
+### settings
 
 - `loglevel`: (string) the log level of the extenions. any of the following values is valid:
   - `debug`
@@ -92,7 +92,7 @@ The configuration has two segments: `settings` and `menu`.
   - `warning` (default)
   - `error`
 
-### Menu
+### menu
 
 The menu is an array of items, each being on of the following types.
 
@@ -156,7 +156,7 @@ Icons can be found by searching any subdirectory of the following directories:
 - v3: 31.01.2021
   - extension icon
   - icons for switches
-  - logging adjusted: 
+  - logging adjusted:
     - switch-check adjusted to debug
     - log level logging fixed
 - v4: 01.02.2021
