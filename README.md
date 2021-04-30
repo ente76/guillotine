@@ -17,6 +17,7 @@ The configuration has two segments: `settings` and `menu`.
 ```JSON
 {
   "settings": {
+    "icon": "guillotine-symbolic",
     "loglevel": "warning"
   },
   "menu": [
@@ -86,6 +87,7 @@ The configuration has two segments: `settings` and `menu`.
 
 ### settings
 
+- `icon` (string): name of a system icon to show as the status icon
 - `loglevel`: (string) the log level of the extenions. any of the following values is valid:
   - `debug`
   - `info`
@@ -164,6 +166,8 @@ Icons can be found by searching any subdirectory of the following directories:
   - icon for extensions.gnome.org added
   - button for buy-me-a-coffee added
   - button for paypal donations added
+- unreleased:
+  - configurable status icon
 
 ## ToDo
 

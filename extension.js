@@ -284,7 +284,10 @@ class Separator {
 /***** Guillotine                                                         *****/
 /******************************************************************************/
 
-const settingsChecks = [{ name: "loglevel", type: "string", default: "warning", values: ["debug", "info", "warning", "error"] }];
+const settingsChecks = [
+    { name: "icon", type: "string", default: "guillotine-symbolic" },
+    { name: "loglevel", type: "string", default: "warning", values: ["debug", "info", "warning", "error"] }
+];
 
 class Guillotine {
     constructor(meta) {
@@ -328,9 +331,11 @@ class Guillotine {
         info("Log level at: " + this.settings.loglevel);
 
         // icon
-        let icon = Gio.icon_new_for_string(Me.path + "/guillotine-symbolic.svg");
-        this.icon = new St.Icon({ gicon: icon });
-        this.icon.style_class = "system-status-icon";
+        this.icon = new St.Icon({ style_class: "system-status-icon" });
+        if (this.settings.icon.toLowerCase() == "guillotine-symbolic")
+            this.icon.gicon = Gio.icon_new_for_string(Me.path + "/guillotine-symbolic.svg");
+        else
+            this.icon.icon_name = this.settings.icon;
 
         // button
         this.button = new UI.panelMenu.Button(0.0, "guillotine", false);
