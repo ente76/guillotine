@@ -166,8 +166,8 @@ Icons can be found by searching any subdirectory of the following directories:
   - icon for extensions.gnome.org added
   - button for buy-me-a-coffee added
   - button for paypal donations added
-- unreleased:
-  - configurable status icon
+- v5: 30.04.2021:
+  - configurable status icon (provided by [hashstat](https://github.com/hashstat))
 
 ## ToDo
 
@@ -180,6 +180,11 @@ Plans. For whenever I will get bored again.
 - [ ] error handling
   - [ ] notifications
   - [ ] icon update
+
+## Contributors
+
+- [ente](https://github.com/ente76)
+- [hashstat](https://github.com/hashstat)
 
 ## License
 
