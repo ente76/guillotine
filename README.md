@@ -168,6 +168,10 @@ Icons can be found by searching any subdirectory of the following directories:
   - button for paypal donations added
 - v5: 30.04.2021:
   - configurable status icon (provided by [hashstat](https://github.com/hashstat))
+- v6: 14.06.2021
+  - adjust gnome version number
+- v7: 06.11.2021
+  - add gnome 41 compatibility (provided by [aliakseiz](https://github.com/aliakseiz))
 
 ## ToDo
 
@@ -185,6 +189,7 @@ Plans. For whenever I will get bored again.
 
 - [ente](https://github.com/ente76)
 - [hashstat](https://github.com/hashstat)
+- [aliakseiz](https://github.com/aliakseiz)
 
 ## License
 
