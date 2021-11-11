@@ -149,8 +149,8 @@ Icons can be found by searching any subdirectory of the following directories:
 
 ## Change History
 
-- v1: 26.01.2026
-  - initiale version
+- v1: 26.01.2021
+  - initial version
 - v2: 29.01.2021
   - fixed a bug which prevented startup
   - implemented "submenu"
