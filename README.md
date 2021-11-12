@@ -79,7 +79,7 @@ The configuration has two segments: `settings` and `menu`.
       "stop": "systemctl --user --quiet stop syncthing.service",
       "check": "systemctl --user --quiet is-active syncthing.service",
       "icon": "emblem-synchronizing-symbolic",
-      "interval": 500
+      "interval": 1
     }
   ]
 }
@@ -110,8 +110,6 @@ The menu is an array of items, each being on of the following types.
   - `killBeforeRestart`: the running process is killed forcefully when the menu is selected a second time
 - `killOnDisable` (boolean): whether the process gets killed when the extension gets disabled, defaults to `true`
 
-The options `singleInstance`, `killBeforeRestart` and `killOnDisable` have no impact on background processes, i.e., these options don't work on something like `sh -c 'long-running-command &'`. Some applications are implicitly behaving like this.
-
 #### 2. switch
 
 - `type`: `switch`
@@ -119,13 +117,13 @@ The options `singleInstance`, `killBeforeRestart` and `killOnDisable` have no im
 - `icon` (string): name of a system icon to show
 - `start` (string): command to execute when switching from off to on
 - `stop` (string): command to execute when switching from on to off
-- `check` (string): command to run when checking the toggle state
+- `check` (string): command to run when checking the toggle stat
+  - exit code `0`: the service is currently running, the switch is `on`
+  - other exit code: the service is stopped, the switch is `off`
 - `interval` (number): time between 2 checks in miliseconds
   - defaults to 500
   - depends on `checks`
-  - the interval is the length of the pause between 2 checks, i.e. if the command assigned to `check` takes 200 ms to execute and `interval` is set to 500, the command is started every 700 ms.
-
-A switch is strictly running a single instance. You won't be able to access the menu item while the `start` or the `stop` command are executed. To be more precise: a `start` and a `stop` command will disable the menu. The next `check` command may enable the menu on success.
+  - the interval is the length of the pause between 2 checks, i.e. if the command assigned to `check` takes 1s to execute and `interval` is set to 2, the command is started every 3s.
 
 #### 3. submenu
 
@@ -137,6 +135,22 @@ A switch is strictly running a single instance. You won't be able to access the 
 #### 4. separator
 
 - `type`: `separator`
+
+### Commands
+
+`start`, `stop`, `check` and `command` are commands to be executed. It is highly recommended to test these commands extensively in a shell before adjusting the configuration. A shell that actually shows return codes (e.g. `zsh` with `powerlevel10k`) is recommended especially when testing switches.
+
+The return code of all commands is checked. For `start`, `stop` and `command` a non-zero return code will currently only result in a log entry. For `check` the return code determines the switch state and no log entry is created.
+
+There is no shell environment that commands are executed in. To use shell syntax, simply start any shell of your preference and ask the shell to execute the command: `"check": "sh -c 'if [ -f /folder/file ]; then exit 0; else exit 1; fi'"` which could be boiled down to `"check": "sh -c 'exit $([ -f /folder/file ])'"`.
+
+Executing multiple commands with a single menu item works by calling a shell as well: `"command": "sh -c 'command1; command2'"`.
+
+Executing commands directly or using a shell will happen in background. If you need foreground feedback, execute a terminal and pass the actual command to the terminal: `"command": "gnome-terminal -e 'journalctl -f GNOME_SHELL_EXTENSION_UUID=guillotine@fopdoodle.net'"`.
+
+The options `singleInstance`, `killBeforeRestart` and `killOnDisable` have no impact on background processes, i.e., these options don't work on something like `sh -c 'long-running-command &'`. Some applications are implicitly behaving like this, e.g. firefox.
+
+A switch is strictly running a single instance of all commands. You won't be able to access the menu item while the `start` or the `stop` command are executed. To be more precise: a `start` and a `stop` command will disable the menu and trigger a `check` command. On return of the `check` command the menu item gets enabled and switch to the correct state depending on the return code.
 
 ### Icons
 
@@ -172,6 +186,12 @@ Icons can be found by searching any subdirectory of the following directories:
   - adjust gnome version number
 - v7: 06.11.2021
   - add gnome 41 compatibility (provided by [aliakseiz](https://github.com/aliakseiz))
+- v8: .....
+  - improve the documentation of commands
+  - implement exception handling for malformed commands
+  - switch the interval setting from ms to s
+  - implement shut down functionality for switch commands
+  - prepare a set of test cases
 
 ## ToDo
 
