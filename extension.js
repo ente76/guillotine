@@ -60,7 +60,7 @@ function notify(message, details) {
 const commandChecks = [{ name: "title", type: "string", default: "???" },
 { name: "icon", type: "string" },
 { name: "command", type: "string" },
-{ name: "instancing", type: "string", values: ["singleinstance", "multipleinstances", "killbeforerestart"], default: "multipleinstances" },
+{ name: "instancing", type: "string", values: ["singleinstance", "multipleinstances"], default: "multipleinstances" },
 { name: "killOnDisable", type: "boolean", default: true }];
 
 class Command {
@@ -89,14 +89,10 @@ class Command {
     }
 
     execute() {
-        if ((this.instancing === "killbeforerestart") && (Object.keys(this.processes) > 0)) {
-            let pid = Object.keys(this.processes)[0];
-            info("process for '" + this.title + "' [" + pid + "] is still running. Termination signal will be issued.");
-            this.processes[pid].force_exit();
-        } else {
-            if (this.instancing === "singleinstance") {
-                this.UI.setSensitive(false);
-            }
+        if (this.instancing === "singleinstance") {
+            this.UI.setSensitive(false);
+        }
+        try {
             let [_, argv] = GLib.shell_parse_argv(this.command);
             let subprocess = new Gio.Subprocess({
                 argv: argv,
@@ -108,17 +104,25 @@ class Command {
             let pid = subprocess.get_identifier();
             subprocess.wait_check_async(null, this.executed.bind(this, pid));
             this.processes[pid] = subprocess;
-            info("process for '" + this.title + "' [" + pid + "] started");
+            info("Process for '" + this.title + "' [" + pid + "] started.");
+        } catch (e) {
+            this.UI.setSensitive(false);
+            error("Spawning process for '" + this.title + "' failed.", e);
         }
     }
 
-    executed(pid) {
-        let result = this.processes[pid].get_exit_status();
-        if (result) error("process for '" + this.title + "' [" + pid + "] exited with return code: " + result + "\ncommand: " + this.command);
-        else info("process for '" + this.title + "' [" + pid + "] exited without error");
-
-        if (!this.canceled) this.UI.setSensitive(true);
+    executed(pid, process) {
+        process.wait(null);
         delete this.processes[pid];
+        if (process.get_if_signaled()) {
+            let signal = process.get_term_sig();
+            error("Process for '" + this.title + "' [" + pid + "] was terminated by signal: " + signal + ".");
+        } else {
+            let result = process.get_exit_status();
+            if (result) error("Process for '" + this.title + "' [" + pid + "] exited with return code: " + result + "\ncommand: " + this.command);
+            else info("Process for '" + this.title + "' [" + pid + "] exited without error.");
+        }
+        if (!this.canceled) this.UI.setSensitive(true);
     }
 
     cancel() {
