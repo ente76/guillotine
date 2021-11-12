@@ -140,12 +140,13 @@ const switchChecks = [{ name: "title", type: "string", default: "???" },
 { name: "start", type: "string" },
 { name: "stop", type: "string" },
 { name: "check", type: "string" },
-{ name: "interval", type: "number", default: 500 }];
+{ name: "interval", type: "number", default: 5 }];
 
 class Switch {
     constructor(properties) {
         this.canceled = false;
         let self = {};
+
         // sanity checks
         parseProperties(properties, self, switchChecks);
         Object.assign(this, self);
@@ -159,79 +160,135 @@ class Switch {
             this.UI.insert_child_at_index(this.UI.icon, 1);
         }
 
-        if (!("start" in this)) this.UI.setSensitive(false);
+        this.UI.setSensitive(false);
 
         // setup callbacks
         this.UI.connect('activate', this.switch.bind(this));
         if ("check" in this) this.timer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 0, this.test.bind(this, true));
+        else {
+            error("Switch '" + this.title + "' has no check command defined.")
+        }
+
         this.processes = {};
-        debug("menu item '" + this.title + "' created");
+        debug("Menu item '" + this.title + "' initialized.");
     }
 
     switch() {
+        // don't allow another interaction with this item
         this.UI.setSensitive(false);
-        GLib.source_remove(this.timer);
+        // cancel all automatic interval checks & signal manual switching
+        if ("timer" in this) GLib.source_remove(this.timer);
         delete this.timer;
+
         let command;
         if (this.UI.state) command = this.start;
         else command = this.stop;
-        let [_, argv] = GLib.shell_parse_argv(command);
-        let subprocess = new Gio.Subprocess({
-            argv: argv,
-            flags: Gio.SubprocessFlags.NONE
-        });
-        subprocess.init(null);
 
-        // Check the process completion
-        let pid = subprocess.get_identifier();
-        subprocess.wait_check_async(null, this.switched.bind(this, pid));
-        this.processes[pid] = subprocess;
-        info("switching process for '" + this.title + "' [" + pid + "] started");
+        try {
+            let [_, argv] = GLib.shell_parse_argv(command);
+            let subprocess = new Gio.Subprocess({
+                argv: argv,
+                flags: Gio.SubprocessFlags.NONE
+            });
+            subprocess.init(null);
+
+            let pid = subprocess.get_identifier();
+            subprocess.wait_check_async(null, this.switched.bind(this, pid, this.UI.state));
+            this.processes[pid] = subprocess;
+            if (this.UI.state) error("Start process for switch '" + this.title + "' started.");
+            else error("Stop process for switch '" + this.title + "' started.");
+        } catch (e) {
+            if (this.UI.state) error("Spawning start process for switch '" + this.title + "' failed.", e);
+            else error("Spawning stop process for switch '" + this.title + "' failed.", e);
+        }
     }
 
-    switched(pid, oldState) {
-        let result = this.processes[pid].get_exit_status();
-        if (result) error("switching process for '" + this.title + "' [" + pid + "] exited with return code: " + result + "\ncommand: " + this.command);
-        else info("switching process for '" + this.title + "' [" + pid + "] exited without error");
+    switched(pid, oldState, process) {
+        if (this.canceled) return;
+        process.wait(null);
         delete this.processes[pid];
+        if (process.get_if_signaled()) {
+            let signal = process.get_term_sig();
+            if (oldState) error("Spawning start process for switch '" + this.title + "' was terminated by signal: " + signal + ".");
+            else error("Spawning stop process for switch '" + this.title + "' was terminated by signal: " + signal + ".");
+        } else {
+            let result = process.get_exit_status();
+            if (result) {
+                if (oldState) error("Start process for switch '" + this.title + "' [" + pid + "] exited with return code: " + result + ".");
+                else error("Stop process for switch '" + this.title + "' [" + pid + "] exited with return code: " + result + ".");
+            }
+            else {
+                if (oldState) info("Start process for switch '" + this.title + "' [" + pid + "] exited without error.");
+                else info("Start process for switch '" + this.title + "' [" + pid + "] exited without error.");
+            }
+        }
         this.test(false);
     }
 
-    test(auto) {
-        let [_, argv] = GLib.shell_parse_argv(this.check);
-        let subprocess = new Gio.Subprocess({
-            argv: argv,
-            flags: Gio.SubprocessFlags.NONE
-        });
-        subprocess.init(null);
+    test(interval) {
+        // if canceled: abort any further tests
+        if (this.canceled) return false;
+        // if this is an automatic triggered interval test (interval is true) but there 
+        // was some manual switching (timer is not defined), then abort and also
+        // don't allow further automatic tests
+        if ((interval) && !("timer" in this)) return false;
+        // prevent further automatic tests for now
+        if ("timer" in this) GLib.source_remove(this.timer);
+        try {
+            let [_, argv] = GLib.shell_parse_argv(this.check);
+            let subprocess = new Gio.Subprocess({
+                argv: argv,
+                flags: Gio.SubprocessFlags.NONE
+            });
+            subprocess.init(null);
 
-        // Check the process completion
-        let pid = subprocess.get_identifier();
-        subprocess.wait_check_async(null, this.tested.bind(this, pid, auto));
-        this.processes[pid] = subprocess;
-        debug("checking process for '" + this.title + "' [" + pid + "] started");
+            let pid = subprocess.get_identifier();
+            subprocess.wait_check_async(null, this.tested.bind(this, pid, interval));
+            this.processes[pid] = subprocess;
+            debug("Check process for switch '" + this.title + "' [" + pid + "] started.");
+        } catch (e) {
+            error("Spawning the check process for switch '" + this.title + "' failed.", e);
+            return false;
+        }
+        return false;
     }
 
-    tested(pid, auto) {
-        if (!("timer" in this) && (auto)) return;
-        let result = this.processes[pid].get_exit_status();
-        if (result) debug("'" + this.title + "' check return code: " + result + " --> off");
-        else debug("'" + this.title + "' check return code: " + result + " --> on");
-        if (this.canceled) return;
-        if (result) this.UI.setToggleState(false);
-        else this.UI.setToggleState(true);
-        if ((result) && ("start" in this)) this.UI.setSensitive(true);
-        if ((!result) && ("stop" in this)) this.UI.setSensitive(true);
-        this.timer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, this.interval, this.test.bind(this));
+    tested(pid, interval, process) {
+        info("interval: " + interval + " pid: " + pid);
+        // if canceled: abort any further tests
+        if (this.canceled) return false;
+        process.wait(null);
         delete this.processes[pid];
+        if (process.get_if_signaled()) {
+            let signal = process.get_term_sig();
+            error("Check process for switch '" + this.title + "' [" + pid + "] was terminated by signal: " + signal + ". No more checks will be scheduled.");
+        } else if ((interval) && !("timer" in this)) {
+            // if this is an automatic triggered interval test (interval is true) but there 
+            // was some manual switching (timer is not defined), then abort and also
+            // don't allow further automatic tests
+            debug("Check process for switch '" + this.title + "' [" + pid + "] exited without error. Result is ignored due to initiating a manual switching meanwhile");
+        } else {
+            let result = process.get_exit_status();
+            if (result) error("Check process for switch '" + this.title + "' [" + pid + "] exited with return code: " + result + " --> switch is turned off.");
+            else info("Check process for switch '" + this.title + "' [" + pid + "] exited without error --> switch is turned on.");
+
+            if (result) this.UI.setToggleState(false);
+            else this.UI.setToggleState(true);
+
+            if ((!this.canceled) && (result) && ("start" in this)) this.UI.setSensitive(true);
+            if ((!this.canceled) && (!result) && ("stop" in this)) this.UI.setSensitive(true);
+
+            if (!this.canceled) this.timer = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, this.interval, this.test.bind(this, true));
+        }
     }
 
     cancel() {
         debug("cancel called for " + this.title);
-        GLib.source_remove(this.timer);
-        for (pid in this.processes) {
-            info("process for '" + this.title + "' [" + pid + "] is still running. Termination signal will be issued.");
-            let pid = Object.keys(this.processes).length()[0];
+        this.canceled = true;
+        if ("timer" in this) GLib.source_remove(this.timer);
+        delete this.timer;
+        for (const pid in this.processes) {
+            info("Process for switch '" + this.title + "' [" + pid + "] is still running. Termination signal will be issued.");
             this.processes[pid].force_exit();
         }
     }

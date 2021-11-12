@@ -1,6 +1,6 @@
 {
     "settings": {
-        "loglevel": "warning"
+        "loglevel": "debug"
     },
     "menu": [
         {
@@ -35,36 +35,29 @@
             ]
         },
         {
-            "type": "submenu",
-            "title": "Guillotine Tests",
-            "icon": "guillotine-symbolic",
-            "items": [
-                {
-                    "type": "command",
-                    "title": "disable guillotine, enable guillotine",
-                    "command": "sh -c 'gnome-extensions disable guillotine@fopdoodle.net;sleep 3;gnome-extensions enable guillotine@fopdoodle.net'",
-                    "killOnDisable": false
-                },
-                {
-                    "type": "command",
-                    "title": "command that lacks a command"
-                },
-                {
-                    "type": "command",
-                    "title": "fail to spawn",
-                    "command": "if [ -f /folder/file ]"
-                },
-                {
-                    "type": "command",
-                    "title": "looong runnint process to be killed",
-                    "command": "zsh -c 'sleep 100000000'"
-                },
-                {
-                    "type": "command",
-                    "title": "kill looong runnint process",
-                    "command": "zsh -c 'kill $(ps --format pid -C \"sleep 100000000\" --no-headers)'"
-                }
-            ]
+            "type": "command",
+            "title": "disable guillotine, enable guillotine",
+            "command": "sh -c 'gnome-extensions disable guillotine@fopdoodle.net;sleep 3;gnome-extensions enable guillotine@fopdoodle.net'",
+            "killOnDisable": false
+        },
+        {
+            "type": "command",
+            "title": "command that lacks a command"
+        },
+        {
+            "type": "command",
+            "title": "fail to spawn",
+            "command": "if [ -f /folder/file ]"
+        },
+        {
+            "type": "command",
+            "title": "looong runnint process to be killed",
+            "command": "zsh -c 'sleep 100000000'"
+        },
+        {
+            "type": "command",
+            "title": "kill looong runnint process",
+            "command": "zsh -c 'kill $(ps --format pid -C \"sleep 100000000\" --no-headers)'"
         }
     ]
 }
