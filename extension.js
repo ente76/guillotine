@@ -39,18 +39,13 @@ function warning(message) {
     }
 }
 
-function error(message) {
+function error(message, error) {
     if (LogLevel <= ERROR) {
-        log("[guillotine ERROR] " + message);
-    }
-}
-
-function errorDetails(message, error) {
-    if (LogLevel <= ERROR) {
-        if (error instanceof GLib.Error)
-            log("[guillotine ERROR]" + message + "\n" + "GLib.Error(" + error.code + ") " + error.message)
-        if (error instanceof Error)
-            log("[guillotine ERROR] " + message + "\n" + error.toString() + "\n" + error.stack)
+        if (typeof error === 'undefined') {
+            log("[guillotine ERROR] " + message);
+        } else {
+            log("[guillotine ERROR] " + message + "\n" + error)
+        }
     }
 }
 
@@ -311,12 +306,12 @@ class Guillotine {
             parseProperties(this.config.settings, this.settings, settingsChecks);
             this.menu = parseMenu(this.config.menu);
         }
-        catch (error) {
-            errorDetails("Loading config failed due to an error.", error);
+        catch (e) {
+            error("Loading config failed.", e);
             // TODO: get a better warning icon
             // icon
             this.icon = new St.Icon({
-                icon_name: "gtk-no",
+                icon_name: "dialog-error",
                 style_class: "system-status-icon"
             });
 
