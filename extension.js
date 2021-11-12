@@ -67,16 +67,16 @@ class Command {
     constructor(properties) {
         this.canceled = false;
         let self = {};
+
         // sanity checks
         parseProperties(properties, self, commandChecks);
         Object.assign(this, self);
-        // setup UI
 
+        // setup UI
         if ("icon" in this) {
             if (this.icon.toLowerCase() === "guillotine-symbolic") this.UI = new UI.popupMenu.PopupImageMenuItem(this.title, Gio.icon_new_for_string(Me.path + "/guillotine-symbolic.svg"));
             else this.UI = new UI.popupMenu.PopupImageMenuItem(this.title, this.icon);
         }
-
         else
             this.UI = new UI.popupMenu.PopupMenuItem(this.title);
         if (!("command" in this))
@@ -85,7 +85,7 @@ class Command {
         // setup callbacks
         this.UI.connect('activate', this.execute.bind(this))
         this.processes = {};
-        debug("menu item '" + this.title + "' created");
+        debug("Menu item '" + this.title + "' initialized.");
     }
 
     execute() {
@@ -126,11 +126,10 @@ class Command {
     }
 
     cancel() {
-        debug("cancel called for " + this.title);
+        debug("Cancel called for " + this.title + ".");
         this.canceled = true;
         if (this.killOnDisable) for (const pid in this.processes) {
-            info("process for '" + this.title + "' [" + pid + "] is still running. Termination signal will be issued.");
-            //let pid = Object.keys(this.processes).length()[0];
+            info("Process for '" + this.title + "' [" + pid + "] is still running. Termination signal will be issued.");
             this.processes[pid].force_exit();
         }
     }
