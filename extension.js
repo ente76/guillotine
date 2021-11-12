@@ -260,7 +260,9 @@ class SubMenu {
     }
 
     cancel() {
-
+        for (const item in this.items) {
+            this.items[item].cancel();
+        }
     }
 }
 
