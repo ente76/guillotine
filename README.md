@@ -141,7 +141,7 @@ The configuration has two segments: `settings` and `menu`.
 
 ### menu
 
-The menu is an array of items, each being on of the following types.
+The menu is an array of items, each being one of the following types.
 
 #### 1. command
 
@@ -152,7 +152,6 @@ The menu is an array of items, each being on of the following types.
 - `instancing` (string): how to handle a running process. Either of the following values is valid:
   - `singleInstance`: the menu item is disabled until the old process finished
   - `multipleInstances` (default): no restrictions; multiple instances may be executed in parallel
-  - `killBeforeRestart`: the running process is killed forcefully when the menu is selected a second time
 - `killOnDisable` (boolean): whether the process gets killed when the extension gets disabled, defaults to `true`
 
 #### 2. switch
@@ -237,10 +236,13 @@ Icons can be found by searching any subdirectory of the following directories:
 - v8: 13.11.2021
   - improve the documentation of commands
   - implement exception handling for malformed commands
-  - implement the interval setting in s and ms
+  - implement the interval settings in s and ms granularity
+    - deprecated `interval`
   - implement shut down functionality for switch commands
   - prepare a set of test cases
   - implement notifications based on log entries with separate level filter
+  - removed `killBeforeRestart` option from `command` (complex functionality with limited use)
+    - a notification will be raised if in use (this will be removed in the next version)
 
 ## ToDo
 

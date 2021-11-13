@@ -78,7 +78,7 @@ function notify(message, details) {
 const commandChecks = [{ name: "title", type: "string", default: "???" },
 { name: "icon", type: "string" },
 { name: "command", type: "string" },
-{ name: "instancing", type: "string", values: ["singleinstance", "multipleinstances"], default: "multipleinstances" },
+{ name: "instancing", type: "string", values: ["singleinstance", "multipleinstances", "killbeforerestart"], default: "multipleinstances" },
 { name: "killOnDisable", type: "boolean", default: true }];
 
 class Command {
@@ -99,6 +99,10 @@ class Command {
             this.UI = new UI.popupMenu.PopupMenuItem(this.title);
         if (!("command" in this))
             this.UI.setSensitive(false);
+
+        if (this.instancing === "killbeforerestart") {
+            notify("Guillotine Warning", "The option 'killBeforeRestart' has been removed. The option no longer has any effect.");
+        }
 
         // setup callbacks
         this.UI.connect('activate', this.execute.bind(this))
