@@ -16,81 +16,111 @@ The configuration has two segments: `settings` and `menu`.
 
 ```JSON
 {
-  "settings": {
-    "icon": "guillotine-symbolic",
-    "loglevel": "warning"
-  },
-  "menu": [
-    {
-      "type": "command",
-      "title": "teamspeak",
-      "command": "zsh -c 'pactl set-card-profile $(pactl list short | grep bluez_card | cut -f1) headset_head_unit;pactl set-default-sink $(pactl list short sinks | grep alsa_output | cut -f1);teamspeak3'",
-      "icon": "audio-headset-symbolic"
+    "settings": {
+        "loglevel": "warning"
     },
-    {
-      "type": "separator"
-    },
-    {
-      "type": "command",
-      "title": "code guillotine",
-      "command": "code Projects/guillotine",
-      "icon": "start-here-symbolic.symbolic",
-      "killOnDisable": false
-    },
-    {
-      "type": "command",
-      "title": "code systemd.rs",
-      "command": "code Projects/systemd.rs",
-      "icon": "computer-fail-symbolic.symbolic",
-      "killOnDisable": false
-    },
-    {
-      "type": "separator"
-    },
-    {
-      "type": "submenu",
-      "title": "Guillotine",
-      "icon": "guillotine-symbolic",
-      "items": [
+    "menu": [
         {
-          "type": "command",
-          "title": "Configuration",
-          "command": "xdg-open .config/guillotine.json",
-          "instancing": "singleInstance",
-          "icon": "preferences-other-symbolic",
-          "killOnDisable": false
+            "type": "command",
+            "title": "teamspeak",
+            "command": "sh -c 'pactl set-card-profile $(pactl list short | grep bluez_card | cut -f1) headset_head_unit;pactl set-default-sink $(pactl list short sinks | grep alsa_output | cut -f1);teamspeak3'",
+            "icon": "audio-headset-symbolic"
         },
         {
-          "type": "command",
-          "title": "Log",
-          "command": "gnome-terminal -e 'journalctl -f GNOME_SHELL_EXTENSION_UUID=guillotine@fopdoodle.net'",
-          "instancing": "singleInstance",
-          "icon": "emblem-documents-symbolic",
-          "killOnDisable": false
+            "type": "separator"
         },
         {
-          "type": "command",
-          "title": "Log gnome-shell",
-          "command": "gnome-terminal -e 'journalctl -f _COMM=gnome-shell' ",
-          "instancing": "singleInstance",
-          "icon": "emblem-documents-symbolic",
-          "killOnDisable": false
+            "type": "submenu",
+            "title": "code",
+            "icon": "com.visualstudio.code.oss",
+            "items": [
+                {
+                    "type": "command",
+                    "title": "guillotine",
+                    "command": "code Projects/guillotine",
+                    "icon": "guillotine-symbolic",
+                    "killOnDisable": false
+                },
+                {
+                    "type": "command",
+                    "title": "kitsch",
+                    "command": "code Projects/kitsch",
+                    "icon": "guillotine-symbolic",
+                    "killOnDisable": false
+                }
+            ]
+        },
+        {
+            "type": "separator"
+        },
+        {
+            "type": "submenu",
+            "title": "Remote",
+            "icon": "network-server-symbolic",
+            "items": [
+                {
+                    "type": "command",
+                    "title": "ssh remote.server.tld",
+                    "command": "gnome-terminal -e 'ssh remote.server.tld'",
+                    "icon": "preferences-other-symbolic",
+                    "killOnDisable": false
+                },
+                {
+                    "type": "command",
+                    "title": "nautilus remote.server.tld",
+                    "command": "nautilus ssh://remote.server.tld",
+                    "instancing": "singleInstance",
+                    "icon": "preferences-other-symbolic",
+                    "killOnDisable": false
+                }
+            ]
+        },
+        {
+            "type": "separator"
+        },
+        {
+            "type": "submenu",
+            "title": "Guillotine",
+            "icon": "guillotine-symbolic",
+            "items": [
+                {
+                    "type": "command",
+                    "title": "Configuration",
+                    "command": "code .config/guillotine.json",
+                    "icon": "preferences-other-symbolic",
+                    "killOnDisable": false
+                },
+                {
+                    "type": "command",
+                    "title": "Log",
+                    "command": "gnome-terminal -e 'journalctl -f GNOME_SHELL_EXTENSION_UUID=guillotine@fopdoodle.net'",
+                    "instancing": "singleInstance",
+                    "icon": "emblem-documents-symbolic",
+                    "killOnDisable": false
+                },
+                {
+                    "type": "command",
+                    "title": "Log Gnome Shell",
+                    "command": "gnome-terminal -e 'journalctl -f _COMM=gnome-shell' ",
+                    "instancing": "singleInstance",
+                    "icon": "emblem-documents-symbolic",
+                    "killOnDisable": false
+                }
+            ]
+        },
+        {
+            "type": "separator"
+        },
+        {
+            "type": "switch",
+            "title": "syncthing",
+            "start": "systemctl --user start syncthing.service",
+            "stop": "systemctl --user stop syncthing.service",
+            "check": "systemctl --user is-active syncthing.service",
+            "icon": "emblem-synchronizing-symbolic",
+            "interval_s": 10
         }
-      ]
-    },
-    {
-      "type": "separator"
-    },
-    {
-      "type": "switch",
-      "title": "syncthing",
-      "start": "systemctl --user start syncthing.service",
-      "stop": "systemctl --user stop syncthing.service",
-      "check": "systemctl --user is-active syncthing.service",
-      "icon": "emblem-synchronizing-symbolic",
-      "interval": 1
-    }
-  ]
+    ]
 }
 ```
 
