@@ -2,7 +2,7 @@
     "uuid": "guillotine@fopdoodle.net",
     "name": "Guillotine",
     "description": "Guillotine is a gnome extension designed for efficiently carrying out executions of commands from a customizable menu. Simply speaking: it is a highly customizable menu that enables you to launch commands and toggle services.",
-    "version": 7,
+    "version": 8,
     "url": "https://github.com/ente76/guillotine/",
     "settings-schema": "org.gnome.shell.extensions.guillotine",
     "shell-version": [
