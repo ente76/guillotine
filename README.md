@@ -243,6 +243,8 @@ Icons can be found by searching any subdirectory of the following directories:
   - implement notifications based on log entries with separate level filter
   - removed `killBeforeRestart` option from `command` (complex functionality with limited use)
     - a notification will be raised if in use (this will be removed in the next version)
+- v9: 13.11.2021
+  - fix a complaint from extension review
 
 ## ToDo
 
