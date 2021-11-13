@@ -26,7 +26,7 @@
         },
         {
           "type": "command",
-          "title": "Log Gnome Shell",
+          "title": "Log gnome-shell",
           "command": "gnome-terminal -e 'journalctl -f _COMM=gnome-shell' ",
           "instancing": "singleInstance",
           "icon": "emblem-documents-symbolic",

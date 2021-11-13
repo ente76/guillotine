@@ -15,7 +15,9 @@ const DEBUG = 0;
 const INFO = 1;
 const WARNING = 2;
 const ERROR = 3;
+const OFF = 4;
 var LogLevel = WARNING;
+var NotificationLevel = OFF;
 
 /******************************************************************************/
 /***** LOGGING                                                            *****/
@@ -25,17 +27,26 @@ function debug(message) {
     if (LogLevel <= DEBUG) {
         log("[guillotine debug] " + message);
     }
+    if (NotificationLevel <= DEBUG) {
+        notify("[guillotine debug]", message);
+    }
 }
 
 function info(message) {
     if (LogLevel <= INFO) {
         log("[guillotine info] " + message);
     }
+    if (NotificationLevel <= INFO) {
+        notify("[guillotine info]", message);
+    }
 }
 
 function warning(message) {
     if (LogLevel <= WARNING) {
         log("[guillotine WARNING] " + message);
+    }
+    if (NotificationLevel <= WARNING) {
+        notify("[guillotine Warning]", message);
     }
 }
 
@@ -45,6 +56,13 @@ function error(message, error) {
             log("[guillotine ERROR] " + message);
         } else {
             log("[guillotine ERROR] " + message + "\n" + error)
+        }
+    }
+    if (NotificationLevel <= WARNING) {
+        if (typeof error === 'undefined') {
+            notify("[guillotine ERROR]", message);
+        } else {
+            notify("[guillotine ERROR]", message + "\n" + error)
         }
     }
 }
@@ -104,23 +122,23 @@ class Command {
             let pid = subprocess.get_identifier();
             subprocess.wait_check_async(null, this.executed.bind(this, pid));
             this.processes[pid] = subprocess;
-            info("Process for '" + this.title + "' [" + pid + "] started.");
+            debug("Process for '" + this.title + "' [" + pid + "] started.");
         } catch (e) {
             this.UI.setSensitive(false);
             error("Spawning process for '" + this.title + "' failed.", e);
         }
     }
 
-    executed(pid, process) {
-        process.wait(null);
+    executed(pid, process, result) {
+        process.wait_finish(result);
         delete this.processes[pid];
         if (process.get_if_signaled()) {
             let signal = process.get_term_sig();
-            error("Process for '" + this.title + "' [" + pid + "] was terminated by signal: " + signal + ".");
+            warning("Process for '" + this.title + "' [" + pid + "] was terminated by signal: " + signal + ".");
         } else {
             let result = process.get_exit_status();
-            if (result) error("Process for '" + this.title + "' [" + pid + "] exited with return code: " + result + "\ncommand: " + this.command);
-            else info("Process for '" + this.title + "' [" + pid + "] exited without error.");
+            if (result) warning("Process for '" + this.title + "' [" + pid + "] finished with return code: " + result + ".");
+            else info("Process for '" + this.title + "' [" + pid + "] finished without error.");
         }
         if (!this.canceled) this.UI.setSensitive(true);
     }
@@ -166,12 +184,14 @@ class Switch {
 
         // setup callbacks
         this.UI.connect('activate', this.switch.bind(this));
-        if ("check" in this) this.timer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 0, this.test.bind(this, true));
-        else {
-            error("Switch '" + this.title + "' has no check command defined.")
+        this.mode = 'interval';
+        if ("check" in this) {
+            this.timer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 0, this.test.bind(this, true));
+        } else {
+            error("Switch '" + this.title + "' has no check command defined. Switch is disabled.");
         }
         if (!("interval" in this) && !("interval_ms" in this) && !("interval_s" in this)) {
-            this.interval_s = 10
+            this.interval_s = 10;
         }
         if (("interval_s" in this)) {
             delete this.interval_ms;
@@ -190,11 +210,13 @@ class Switch {
     }
 
     switch() {
+        info("switch fn");
         // don't allow another interaction with this item
         this.UI.setSensitive(false);
         // cancel all automatic interval checks & signal manual switching
         if ("timer" in this) GLib.source_remove(this.timer);
         delete this.timer;
+        this.mode = 'switch';
 
         let command;
         if (this.UI.state) command = this.start;
@@ -211,45 +233,48 @@ class Switch {
             let pid = subprocess.get_identifier();
             subprocess.wait_check_async(null, this.switched.bind(this, pid, this.UI.state));
             this.processes[pid] = subprocess;
-            if (this.UI.state) error("Start process for switch '" + this.title + "' started.");
-            else error("Stop process for switch '" + this.title + "' started.");
+            if (this.UI.state) debug("Start process for switch '" + this.title + "' started.");
+            else debug("Stop process for switch '" + this.title + "' started.");
         } catch (e) {
-            if (this.UI.state) error("Spawning start process for switch '" + this.title + "' failed.", e);
-            else error("Spawning stop process for switch '" + this.title + "' failed.", e);
+            if (this.UI.state) error("Spawning start process for switch '" + this.title + "' failed. Switch is disabled.", e);
+            else error("Spawning stop process for switch '" + this.title + "' failed. Switch is disabled.", e);
         }
     }
 
-    switched(pid, oldState, process) {
-        if (this.canceled) return;
-        process.wait(null);
+    switched(pid, oldState, process, result) {
+        process.wait_finish(result);
         delete this.processes[pid];
+        if (this.canceled) return;
         if (process.get_if_signaled()) {
             let signal = process.get_term_sig();
-            if (oldState) error("Spawning start process for switch '" + this.title + "' was terminated by signal: " + signal + ".");
-            else error("Spawning stop process for switch '" + this.title + "' was terminated by signal: " + signal + ".");
+            if (oldState) warning("Spawning start process for switch '" + this.title + "' was terminated by signal: " + signal + ".");
+            else warning("Spawning stop process for switch '" + this.title + "' was terminated by signal: " + signal + ".");
         } else {
             let result = process.get_exit_status();
             if (result) {
-                if (oldState) error("Start process for switch '" + this.title + "' [" + pid + "] exited with return code: " + result + ".");
-                else error("Stop process for switch '" + this.title + "' [" + pid + "] exited with return code: " + result + ".");
+                if (oldState) warning("Start process for switch '" + this.title + "' [" + pid + "] finished with return code: " + result + ".");
+                else warning("Stop process for switch '" + this.title + "' [" + pid + "] finished with return code: " + result + ".");
             }
             else {
-                if (oldState) info("Start process for switch '" + this.title + "' [" + pid + "] exited without error.");
-                else info("Start process for switch '" + this.title + "' [" + pid + "] exited without error.");
+                if (oldState) debug("Start process for switch '" + this.title + "' [" + pid + "] finished without error.");
+                else debug("Start process for switch '" + this.title + "' [" + pid + "] finished without error.");
             }
         }
         this.test(false);
     }
 
     test(interval) {
+        // prevent further automatic tests for now
+        if ("timer" in this) GLib.source_remove(this.timer);
+        delete this.timer;
         // if canceled: abort any further tests
         if (this.canceled) return false;
         // if this is an automatic triggered interval test (interval is true) but there 
         // was some manual switching (timer is not defined), then abort and also
         // don't allow further automatic tests
-        if ((interval) && !("timer" in this)) return false;
-        // prevent further automatic tests for now
-        if ("timer" in this) GLib.source_remove(this.timer);
+        if ((interval) && (this.mode === 'switch')) {
+            return false;
+        }
         try {
             let [_, argv] = GLib.shell_parse_argv(this.check);
             let subprocess = new Gio.Subprocess({
@@ -263,30 +288,29 @@ class Switch {
             this.processes[pid] = subprocess;
             debug("Check process for switch '" + this.title + "' [" + pid + "] started.");
         } catch (e) {
-            error("Spawning the check process for switch '" + this.title + "' failed.", e);
+            error("Spawning the check process for switch '" + this.title + "' failed. Switch is disabled.", e);
             return false;
         }
         return false;
     }
 
-    tested(pid, interval, process) {
-        info("interval: " + interval + " pid: " + pid);
+    tested(pid, interval, process, result) {
+        process.wait_finish(result);
+        delete this.processes[pid];
         // if canceled: abort any further tests
         if (this.canceled) return false;
-        process.wait(null);
-        delete this.processes[pid];
         if (process.get_if_signaled()) {
             let signal = process.get_term_sig();
-            error("Check process for switch '" + this.title + "' [" + pid + "] was terminated by signal: " + signal + ". No more checks will be scheduled.");
-        } else if ((interval) && !("timer" in this)) {
+            warning("Check process for switch '" + this.title + "' [" + pid + "] was terminated by signal: " + signal + ". No more checks will be scheduled.");
+        } else if ((this.mode === 'switch') && (interval)) {
             // if this is an automatic triggered interval test (interval is true) but there 
             // was some manual switching (timer is not defined), then abort and also
             // don't allow further automatic tests
             debug("Check process for switch '" + this.title + "' [" + pid + "] exited without error. Result is ignored due to initiating a manual switching meanwhile");
         } else {
             let result = process.get_exit_status();
-            if (result) error("Check process for switch '" + this.title + "' [" + pid + "] exited with return code: " + result + " --> switch is turned off.");
-            else info("Check process for switch '" + this.title + "' [" + pid + "] exited without error --> switch is turned on.");
+            if (result) debug("Check process for switch '" + this.title + "' [" + pid + "] exited with return code: " + result + " --> switch is turned off.");
+            else debug("Check process for switch '" + this.title + "' [" + pid + "] exited without error --> switch is turned on.");
 
             if (result) this.UI.setToggleState(false);
             else this.UI.setToggleState(true);
@@ -295,6 +319,7 @@ class Switch {
             if ((!this.canceled) && (!result) && ("stop" in this)) this.UI.setSensitive(true);
 
             if (!this.canceled) {
+                this.mode = 'interval';
                 if ("interval_s" in this) this.timer = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, this.interval_s, this.test.bind(this, true));
                 else this.timer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, this.interval_ms, this.test.bind(this, true));
             }
@@ -306,6 +331,7 @@ class Switch {
         this.canceled = true;
         if ("timer" in this) GLib.source_remove(this.timer);
         delete this.timer;
+        this.mode = 'switch';
         for (const pid in this.processes) {
             info("Process for switch '" + this.title + "' [" + pid + "] is still running. Termination signal will be issued.");
             this.processes[pid].force_exit();
@@ -335,7 +361,7 @@ class SubMenu {
         for (const item in this.items) {
             this.UI.menu.addMenuItem(this.items[item].UI);
         }
-        debug("menu item '" + this.title + "' created");
+        debug("Menu item '" + this.title + "' initialized.");
     }
 
     cancel() {
@@ -347,7 +373,7 @@ class SubMenu {
 
 class Separator {
     constructor(properties) {
-        debug("separator created");
+        debug("Separator initialized.");
         this.UI = new UI.popupMenu.PopupSeparatorMenuItem(this.title);
     }
 
@@ -362,7 +388,8 @@ class Separator {
 
 const settingsChecks = [
     { name: "icon", type: "string", default: "guillotine-symbolic" },
-    { name: "loglevel", type: "string", default: "warning", values: ["debug", "info", "warning", "error"] }
+    { name: "loglevel", type: "string", default: "warning", values: ["debug", "info", "warning", "error"] },
+    { name: "notificationlevel", type: "string", values: ["debug", "info", "warning", "error"] }
 ];
 
 class Guillotine {
@@ -389,7 +416,6 @@ class Guillotine {
         }
         catch (e) {
             error("Loading config failed.", e);
-            // TODO: get a better warning icon
             // icon
             this.icon = new St.Icon({
                 icon_name: "dialog-error",
@@ -404,7 +430,14 @@ class Guillotine {
         }
 
         LogLevel = ["debug", "info", "warning", "error"].indexOf(this.settings.loglevel.toLowerCase());
-        info("Log level at: " + this.settings.loglevel);
+        debug("Log level at: " + this.settings.loglevel);
+        if ("notificationlevel" in this.settings) {
+            NotificationLevel = ["debug", "info", "warning", "error"].indexOf(this.settings.notificationlevel.toLowerCase());
+            debug("Notification level at: " + this.settings.notificationlevel);
+        } else {
+            NotificationLevel = OFF;
+            debug("Notifications are disabled.");
+        }
 
         // icon
         this.icon = new St.Icon({ style_class: "system-status-icon" });
@@ -480,18 +513,18 @@ function parseProperties(source, target, checks) {
                 // property is defined with wrong type
                 if ("default" in checks[property]) {
                     // property is defined using wrong type --> default value is used
-                    error("invalid value for property " + checks[property].name + ": " + source[checks[property].name] + "\nUsing default value: " + checks[property].default);
+                    warning("invalid value for property " + checks[property].name + ": " + source[checks[property].name] + "\nUsing default value: " + checks[property].default);
                     target[checks[property].name] = checks[property].default;
                 } else
                     // property was defined using wrong type --> default value does not exist --> no value used
-                    error("invalid value for property " + checks[property].name + ": " + source[checks[property].name] + "\nIgnoring the value");
+                    warning("invalid value for property " + checks[property].name + ": " + source[checks[property].name] + "\nIgnoring the value");
             } else
                 // property is defined with correct type
                 if ("values" in checks[property]) {
                     // property is defined with correct type & checks contain a list of valid values
                     if (!checks[property].values.includes(source[checks[property].name].toLowerCase())) {
                         // property is defined with correct type & checks contain a list of valid values --> property does not match any of that list --> default value is used
-                        error("invalid value for property " + checks[property].name + ": " + source[checks[property].name] + "\nUsing default value: " + checks[property].default);
+                        warning("invalid value for property " + checks[property].name + ": " + source[checks[property].name] + "\nUsing default value: " + checks[property].default);
                         target[checks[property].name] = checks[property].default;
                     } else
                         // property is defined with correct type & checks contain a list of valid values --> property does match one of that list
@@ -516,8 +549,6 @@ function parseMenu(menu) {
     types["submenu"] = SubMenu;
     types["separator"] = Separator;
 
-    debug(typeof menu);
-    debug(Array.isArray(menu));
     if (typeof menu === "object" && Array.isArray(menu)) {
         for (const item in menu) {
             if (!("type" in menu[item])) throw new Error("Invalid menu item: missing 'type' property");

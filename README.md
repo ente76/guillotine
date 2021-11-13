@@ -65,7 +65,16 @@ The configuration has two segments: `settings` and `menu`.
           "title": "Log",
           "command": "gnome-terminal -e 'journalctl -f GNOME_SHELL_EXTENSION_UUID=guillotine@fopdoodle.net'",
           "instancing": "singleInstance",
-          "icon": "emblem-documents-symbolic"
+          "icon": "emblem-documents-symbolic",
+          "killOnDisable": false
+        },
+        {
+          "type": "command",
+          "title": "Log gnome-shell",
+          "command": "gnome-terminal -e 'journalctl -f _COMM=gnome-shell' ",
+          "instancing": "singleInstance",
+          "icon": "emblem-documents-symbolic",
+          "killOnDisable": false
         }
       ]
     },
@@ -75,9 +84,9 @@ The configuration has two segments: `settings` and `menu`.
     {
       "type": "switch",
       "title": "syncthing",
-      "start": "systemctl --user --quiet start syncthing.service",
-      "stop": "systemctl --user --quiet stop syncthing.service",
-      "check": "systemctl --user --quiet is-active syncthing.service",
+      "start": "systemctl --user start syncthing.service",
+      "stop": "systemctl --user stop syncthing.service",
+      "check": "systemctl --user is-active syncthing.service",
       "icon": "emblem-synchronizing-symbolic",
       "interval": 1
     }
@@ -88,10 +97,16 @@ The configuration has two segments: `settings` and `menu`.
 ### settings
 
 - `icon` (string): name of a system icon to show as the status icon
-- `loglevel` (string): the log level of the extenions. Any of the following values is valid:
+- `logLevel` (string): the log level of the extenions. Any of the following values is valid:
   - `debug`
   - `info`
   - `warning` (default)
+  - `error`
+- `notificationLevel` (string): the notification level of the extension. Any of the following values is valid:
+  - not defined (default): notifications are disabled
+  - `debug`
+  - `info`
+  - `warning`
   - `error`
 
 ### menu
@@ -124,7 +139,9 @@ The menu is an array of items, each being on of the following types.
 - `interval_ms` (number): time between 2 checks in milliseconds
 - `interval` (number): **[deprecated]** same as `interval_ms`
 
-If no interval is defined, it defaults to `interval_s` at 10 seconds. The interval is the length of the pause between 2 checks, i.e. if the command assigned to `check` takes 1s to execute and `interval_s` is set to 2, the command is spawned every 3s. `interval_s` is less precise as `interval_ms` also in a way that the interval is not guaranteed to be precisely equal to the requested period. In return `interval_s` is supposed to consume less energy. `interval_ms` may become deprecated in the near future if `interval_s` has prooven superior.
+If no interval is defined, it defaults to `interval_s` at 10 seconds. If multiple intervals are defined, `interval_s` has highest priority. The interval is the length of the pause between 2 checks, i.e. if the command assigned to `check` takes 1s to execute and `interval_s` is set to 2, the command is spawned every 3s. `interval_s` is less precise as `interval_ms` also in a way that the interval is not guaranteed to be precisely equal to the requested period. In return `interval_s` is supposed to consume less energy. `interval_ms` may become deprecated in the near future if `interval_s` prooves to be superior. 
+
+**WARNING**: a (very) short interval may cause Gnome to become unresponsive.
 
 #### 3. submenu
 
@@ -187,24 +204,17 @@ Icons can be found by searching any subdirectory of the following directories:
   - adjust gnome version number
 - v7: 06.11.2021
   - add gnome 41 compatibility (provided by [aliakseiz](https://github.com/aliakseiz))
-- v8: .....
+- v8: 13.11.2021
   - improve the documentation of commands
   - implement exception handling for malformed commands
   - implement the interval setting in s and ms
   - implement shut down functionality for switch commands
   - prepare a set of test cases
+  - implement notifications based on log entries with separate level filter
 
 ## ToDo
 
-Plans. For whenever I will get bored again.
-
-- [ ] notifications
-  - [ ] on extension error
-  - [ ] on command error
-  - [ ] on implicit switching
-- [ ] error handling
-  - [ ] notifications
-  - [ ] icon update
+The extension is considered stable. No further improvements are planned for now.
 
 ## Contributors
 
