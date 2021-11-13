@@ -9,7 +9,6 @@ const Gio = imports.gi.Gio;
 const St = imports.gi.St;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
-const Settings = imports.misc.extensionUtils.getSettings();
 
 const DEBUG = 0;
 const INFO = 1;
@@ -480,7 +479,7 @@ class Guillotine {
 
     loadConfig() {
         // determine config location
-        let configFilename = Settings.get_string("config");
+        let configFilename = imports.misc.extensionUtils.getSettings().get_string("config");
         configFilename = configFilename || GLib.get_home_dir() + "/.config/guillotine.json";
         debug("Config location: " + configFilename);
 
