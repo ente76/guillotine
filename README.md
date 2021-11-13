@@ -88,7 +88,7 @@ The configuration has two segments: `settings` and `menu`.
 ### settings
 
 - `icon` (string): name of a system icon to show as the status icon
-- `loglevel`: (string) the log level of the extenions. any of the following values is valid:
+- `loglevel` (string): the log level of the extenions. Any of the following values is valid:
   - `debug`
   - `info`
   - `warning` (default)
@@ -120,10 +120,11 @@ The menu is an array of items, each being on of the following types.
 - `check` (string): command to run when checking the toggle stat
   - exit code `0`: the service is currently running, the switch is `on`
   - other exit code: the service is stopped, the switch is `off`
-- `interval` (number): time between 2 checks in miliseconds
-  - defaults to 500
-  - depends on `checks`
-  - the interval is the length of the pause between 2 checks, i.e. if the command assigned to `check` takes 1s to execute and `interval` is set to 2, the command is started every 3s.
+- `interval_s` (number): time between 2 checks in seconds
+- `interval_ms` (number): time between 2 checks in milliseconds
+- `interval` (number): **[deprecated]** same as `interval_ms`
+
+If no interval is defined, it defaults to `interval_s` at 10 seconds. The interval is the length of the pause between 2 checks, i.e. if the command assigned to `check` takes 1s to execute and `interval_s` is set to 2, the command is spawned every 3s. `interval_s` is less precise as `interval_ms` also in a way that the interval is not guaranteed to be precisely equal to the requested period. In return `interval_s` is supposed to consume less energy. `interval_ms` may become deprecated in the near future if `interval_s` has prooven superior.
 
 #### 3. submenu
 
@@ -189,7 +190,7 @@ Icons can be found by searching any subdirectory of the following directories:
 - v8: .....
   - improve the documentation of commands
   - implement exception handling for malformed commands
-  - switch the interval setting from ms to s
+  - implement the interval setting in s and ms
   - implement shut down functionality for switch commands
   - prepare a set of test cases
 

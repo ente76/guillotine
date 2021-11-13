@@ -140,7 +140,9 @@ const switchChecks = [{ name: "title", type: "string", default: "???" },
 { name: "start", type: "string" },
 { name: "stop", type: "string" },
 { name: "check", type: "string" },
-{ name: "interval", type: "number", default: 5 }];
+{ name: "interval", type: "number" },
+{ name: "interval_s", type: "number" },
+{ name: "interval_ms", type: "number" }];
 
 class Switch {
     constructor(properties) {
@@ -167,6 +169,20 @@ class Switch {
         if ("check" in this) this.timer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 0, this.test.bind(this, true));
         else {
             error("Switch '" + this.title + "' has no check command defined.")
+        }
+        if (!("interval" in this) && !("interval_ms" in this) && !("interval_s" in this)) {
+            this.interval_s = 10
+        }
+        if (("interval_s" in this)) {
+            delete this.interval_ms;
+            delete this.interval;
+        }
+        if (("interval_ms" in this)) {
+            delete this.interval;
+        }
+        if (("interval" in this)) {
+            this.interval_ms = this.interval;
+            delete this.interval;
         }
 
         this.processes = {};
@@ -278,7 +294,10 @@ class Switch {
             if ((!this.canceled) && (result) && ("start" in this)) this.UI.setSensitive(true);
             if ((!this.canceled) && (!result) && ("stop" in this)) this.UI.setSensitive(true);
 
-            if (!this.canceled) this.timer = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, this.interval, this.test.bind(this, true));
+            if (!this.canceled) {
+                if ("interval_s" in this) this.timer = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, this.interval_s, this.test.bind(this, true));
+                else this.timer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, this.interval_ms, this.test.bind(this, true));
+            }
         }
     }
 
