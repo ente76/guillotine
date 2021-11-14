@@ -195,9 +195,15 @@ Executing multiple commands with a single menu item works by calling a shell as 
 
 Executing commands directly or using a shell will happen in background. If you need foreground feedback, execute a terminal and pass the actual command to the terminal: `"command": "gnome-terminal -e 'journalctl -f GNOME_SHELL_EXTENSION_UUID=guillotine@fopdoodle.net'"`.
 
-The options `singleInstance`, `killBeforeRestart` and `killOnDisable` have no impact on background processes, i.e., these options don't work on something like `sh -c 'long-running-command &'`. Some applications are implicitly behaving like this, e.g. firefox.
+The options `singleInstance` and `killOnDisable` have no impact on background processes, i.e., these options don't work on something like `sh -c 'long-running-command &'`. Some applications are implicitly behaving like this, e.g. firefox & gnome-terminal.
 
-A switch is strictly running a single instance of all commands. You won't be able to access the menu item while the `start` or the `stop` command are executed. To be more precise: a `start` and a `stop` command will disable the menu and trigger a `check` command. On return of the `check` command the menu item gets enabled and switch to the correct state depending on the return code.
+A switch is strictly running a single instance of all commands. You won't be able to access the menu item while the `start` or the `stop` command are executed. To be more precise: a `start` and a `stop` command will disable the menu and trigger a `check` command. On return of the `check` command the menu item gets enabled and switch to the correct state depending on the return code. The operation of a switch can be best observed on the following example: Initially the switch is in state `off`. When manually switching to `on`, the switch becomes disabled (can't be accessed). The `start` command will be executed but it will always be considered a failure (return code != 0, an error is logged) and it will trigger an immediate check. The check command will last 10 seconds before returning that the switch is `off` (return code != 0, no error is logged). The switch will be returned to state `off` and the switch will be enabled for user input again.
+
+```json
+"start": "sh -c 'exit 1'",
+"stop": "sh -c 'exit 0'",
+"check": "sh -c 'sleep 10;exit 0'"
+```
 
 ### Icons
 
