@@ -202,7 +202,7 @@ A switch is strictly running a single instance of all commands. You won't be abl
 ```json
 "start": "sh -c 'exit 1'",
 "stop": "sh -c 'exit 0'",
-"check": "sh -c 'sleep 10;exit 0'"
+"check": "sh -c 'sleep 10;exit 1'"
 ```
 
 ### Icons
