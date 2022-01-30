@@ -1,18 +1,20 @@
 [![buy me a coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-or%20I%20sing-53a0d0?style=flat&logo=Buy-Me-A-Coffee)](https://www.buymeacoffee.com/ente)  [![donate@paypal](https://img.shields.io/badge/paypal-donation-53a0d0?style=flat&logo=paypal)](https://www.paypal.com/donate?hosted_button_id=CRGNTJBS4AD4G)
 
-# Guillotine
+# This repository has been moved to [GitLab](https://gitlab.com/ente76/guillotine)
+
+## Guillotine
 
 Guillotine is a gnome extension designed for efficiently carrying out executions of commands from a customizable menu. Simply speaking: it is a highly customizable menu that enables you to launch commands and toggle services.
 
 ![example.png](example.png)
 
-## Configuration
+### Configuration
 
 If no configuration is found, a default config is restored at `~/.config/guillotine.json`. Whenever the configuration file changes, the extension reloads automatically.
 
 The configuration has two segments: `settings` and `menu`.
 
-### Example
+#### Example
 
 ```JSON
 {
@@ -124,7 +126,7 @@ The configuration has two segments: `settings` and `menu`.
 }
 ```
 
-### settings
+#### settings
 
 - `icon` (string): name of a system icon to show as the status icon
 - `logLevel` (string): the log level of the extenions. Any of the following values is valid:
@@ -139,11 +141,11 @@ The configuration has two segments: `settings` and `menu`.
   - `warning`
   - `error`
 
-### menu
+#### menu
 
 The menu is an array of items, each being one of the following types.
 
-#### 1. command
+##### 1. command
 
 - `type`: `command`
 - `title` (string): title to show
@@ -154,7 +156,7 @@ The menu is an array of items, each being one of the following types.
   - `multipleInstances` (default): no restrictions; multiple instances may be executed in parallel
 - `killOnDisable` (boolean): whether the process gets killed when the extension gets disabled, defaults to `true`
 
-#### 2. switch
+##### 2. switch
 
 - `type`: `switch`
 - `title` (string): title to show
@@ -172,18 +174,18 @@ If no interval is defined, it defaults to `interval_s` at 10 seconds. If multipl
 
 **WARNING**: a (very) short interval may cause Gnome to become unresponsive.
 
-#### 3. submenu
+##### 3. submenu
 
 - `type`: `switch`
 - `title` (string): title to show
 - `icon` (string): name of a system icon to show
 - `items` ([]): an arry of items, see [menu](###menu)
 
-#### 4. separator
+##### 4. separator
 
 - `type`: `separator`
 
-### Commands
+#### Commands
 
 `start`, `stop`, `check` and `command` are commands to be executed. It is highly recommended to test these commands extensively in a shell before adjusting the configuration. A shell that actually shows return codes (e.g. `zsh` with `powerlevel10k`) is recommended especially when testing switches.
 
@@ -205,7 +207,7 @@ A switch is strictly running a single instance of all commands. You won't be abl
 "check": "sh -c 'sleep 10;exit 1'"
 ```
 
-### Icons
+#### Icons
 
 Icons can be found by searching any subdirectory of the following directories:
 
@@ -214,7 +216,7 @@ Icons can be found by searching any subdirectory of the following directories:
 
 `gtk3-icon-browser` is an app that shows a selection of system icons. Personally I use glade to browse the local icons.
 
-## Change History
+### Change History
 
 - v1: 26.01.2021
   - initial version
@@ -252,17 +254,17 @@ Icons can be found by searching any subdirectory of the following directories:
 - v9: 13.11.2021
   - fix a complaint from extension review
 
-## ToDo
+### ToDo
 
 The extension is considered stable. No further improvements are planned for now.
 
-## Contributors
+### Contributors
 
 - [ente](https://github.com/ente76)
 - [hashstat](https://github.com/hashstat)
 - [aliakseiz](https://github.com/aliakseiz)
 
-## License
+### License
 
 Guillotine: a gnome extension designed for efficiently carrying out executions of commands from a customizable menu
 Copyright (C) 2021 Christian Klaue [mail@ck76.de]
