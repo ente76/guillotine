@@ -168,7 +168,7 @@ The menu is an array of items, each being one of the following types.
 - `interval_ms` (number): time between 2 checks in milliseconds
 - `interval` (number): **[deprecated]** same as `interval_ms`
 
-If no interval is defined, it defaults to `interval_s` at 10 seconds. If multiple intervals are defined, `interval_s` has highest priority. The interval is the length of the pause between 2 checks, i.e. if the command assigned to `check` takes 1s to execute and `interval_s` is set to 2, the command is spawned every 3s. `interval_s` is less precise as `interval_ms` also in a way that the interval is not guaranteed to be precisely equal to the requested period. In return `interval_s` is supposed to consume less energy. `interval_ms` may become deprecated in the near future if `interval_s` prooves to be superior. 
+If no interval is defined, it defaults to `interval_s` at 10 seconds. If multiple intervals are defined, `interval_s` has highest priority. The interval is the length of the pause between 2 checks, i.e. if the command assigned to `check` takes 1s to execute and `interval_s` is set to 2, the command is spawned every 3s. `interval_s` is less precise as `interval_ms` also in a way that the interval is not guaranteed to be precisely equal to the requested period. In return `interval_s` is supposed to consume less energy. `interval_ms` may become deprecated in the near future if `interval_s` prooves to be superior.
 
 **WARNING**: a (very) short interval may cause Gnome to become unresponsive.
 
